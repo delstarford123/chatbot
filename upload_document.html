@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Upload Documents</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #f0f4f8, #d9e2ec);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      margin: 0;
+      padding-top: 40px;
+    }
+
+    .container {
+      background-color: #ffffff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 24px;
+    }
+
+    form label {
+      display: block;
+      margin-bottom: 16px;
+      font-weight: 600;
+      color: #444;
+    }
+
+    input[type="text"],
+    input[type="file"] {
+      width: 100%;
+      padding: 10px 12px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #0078d4;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background-color: #005ea2;
+    }
+
+    .message {
+      margin-bottom: 16px;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .error {
+      background-color: #fdecea;
+      color: #d93025;
+    }
+
+    .success {
+      background-color: #e6f4ea;
+      color: #188038;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+
+    ul li {
+      background-color: #f4f4f4;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin-bottom: 10px;
+      font-size: 15px;
+    }
+
+    ul li a {
+      color: #0078d4;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    ul li a:hover {
+      text-decoration: underline;
+    }
+
+    .empty {
+      text-align: center;
+      font-style: italic;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Upload Lesson Documents</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="message {{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST" enctype="multipart/form-data">
+      <label>Title:
+        <input type="text" name="title" required/>
+      </label>
+
+      <label>File (PDF, DOCX, etc.):
+        <input type="file" name="file" accept=".pdf,.docx" required/>
+      </label>
+
+      <button type="submit">Upload</button>
+    </form>
+
+    <h2>Available Documents</h2>
+    <ul>
+      {% for doc in documents %}
+        <li>
+          <a href="{{ url_for('download_document', filename=doc.filename) }}">
+            {{ doc.title }}
+          </a>
+        </li>
+      {% else %}
+        <li class="empty">No documents uploaded yet.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</body>
+</html>

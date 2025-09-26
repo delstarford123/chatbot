@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Learn Sarah Voice Assistant (Speech + Audio)</title>
+  <style>
+   <style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #f0f4f8, #d9e2ec);
+  }
+
+  #container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-width: 700px;
+    margin: auto;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+  }
+
+  header, footer {
+    padding: 1rem;
+    background: #f4f4f4;
+    border-bottom: 1px solid #ddd;
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    color: #333;
+  }
+
+  .controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.8rem;
+    flex-wrap: wrap;
+  }
+
+  .controls select,
+  .controls input[type="file"] {
+    padding: 0.5rem;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
+  }
+
+  main#chat {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    background: #fafafa;
+    white-space: pre-wrap;
+  }
+
+  .bubble {
+    padding: 0.8rem;
+    margin: 0.6rem 0;
+    border-radius: 10px;
+    max-width: 80%;
+    word-wrap: break-word;
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
+  .user {
+    background: #d1e7dd;
+    margin-left: auto;
+    border: 1px solid #bcd0c7;
+  }
+
+  .bot {
+    background: #f8d7da;
+    margin-right: auto;
+    border: 1px solid #e4b9bc;
+  }
+
+  .loading {
+    font-style: italic;
+    color: #888;
+  }
+
+  footer {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    border-top: 1px solid #ddd;
+  }
+
+  footer input {
+    flex: 1;
+    padding: 0.6rem;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+
+  footer button {
+    padding: 0.6rem 1rem;
+    font-size: 15px;
+    background-color: #0078d4;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  footer button:hover {
+    background-color: #005ea2;
+  }
+
+  a {
+    color: #0078d4;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+</style>
+  </style>
+</head>
+<body>
+  <div id="container">
+    <header>
+      <h1>Learn Sarah Assistant</h1>
+      <div class="controls">
+        <select id="langSelect">
+          <option value="en-US">English</option>
+          <option value="sw-KE">Kiswahili</option>
+        </select>
+        <input type="file" id="pdfUpload" accept=".pdf"/>
+      </div>
+    </header>
+
+    <main id="chat" aria-live="polite"></main>
+
+    <footer>
+      <input id="textIn" placeholder="Type your question…"/>
+      <button id="sendBtn">Send</button>
+      <button id="recordBtn">🎤</button>
+    </footer>
+  </div>
+
+  <script>
+    const chatEl   = document.getElementById("chat");
+    const textIn   = document.getElementById("textIn");
+    const sendBtn  = document.getElementById("sendBtn");
+    const pdfInput = document.getElementById("pdfUpload");
+    const langSel  = document.getElementById("langSelect");
+    const recordBtn= document.getElementById("recordBtn");
+
+    function addBubble(content, cls, isHtml=false) {
+      const d = document.createElement("div");
+      d.className = `bubble ${cls}`;
+      isHtml ? d.innerHTML = content : d.textContent = content;
+      chatEl.appendChild(d);
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
+
+    function showLoading() {
+      addBubble("…thinking…", "loading");
+    }
+
+    // Optional PDF upload
+    pdfInput.addEventListener("change", async () => {
+      const file = pdfInput.files[0];
+      if (!file) return;
+      showLoading();
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/upload", { method:"POST", body:form });
+      document.querySelector(".loading")?.remove();
+      if (res.ok) addBubble("PDF ingested!", "bot");
+      else {
+        const err = await res.json();
+        addBubble(`Error: ${err.error}`, "bot");
+      }
+    });
+
+    // Text‐based chat
+    sendBtn.addEventListener("click", async () => {
+      const msg = textIn.value.trim();
+      if (!msg) return;
+      addBubble(msg, "user");
+      textIn.value = "";
+      await processQuery(msg);
+    });
+
+    // Speech‐based chat
+    let mediaRecorder, audioChunks = [];
+    recordBtn.addEventListener("click", async () => {
+      if (mediaRecorder && mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+        recordBtn.textContent = "🎤";
+      } else {
+        // start recording
+        audioChunks = [];
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+        mediaRecorder.onstop = async () => {
+          const blob = new Blob(audioChunks, { type: "audio/wav" });
+          const form = new FormData();
+          form.append("file", blob, "speech.wav");
+          form.append("lang", langSel.value);
+          showLoading();
+          // Speech‐to‐text
+          const sttRes = await fetch("/stt", { method:"POST", body: form });
+          const { transcript } = await sttRes.json();
+          document.querySelector(".loading")?.remove();
+          if (!transcript) {
+            addBubble("Could not transcribe speech.", "bot");
+            return;
+          }
+          addBubble(transcript, "user");
+          // Process the transcribed query
+          await processQuery(transcript);
+        };
+        mediaRecorder.start();
+        recordBtn.textContent = "⏹️";
+      }
+    });
+
+    // Shared logic: /chat + /tts + render + play
+    async function processQuery(text) {
+      showLoading();
+      // 1) Chat
+      const chatRes = await fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text, lang: langSel.value })
+      });
+      const { context, wiki_html, wiki_url } = await chatRes.json();
+      document.querySelector(".loading")?.remove();
+
+      // 2) Render text bubbles
+      if (context)     addBubble(context, "bot");
+      if (wiki_html)   addBubble(wiki_html, "bot", true);
+      else if (wiki_url) addBubble(
+        `Read more on Wikipedia: <a href="${wiki_url}" target="_blank">${wiki_url}</a>`,
+        "bot", true
+      );
+
+      // 3) Text‐to‐speech
+      const ttsPayload = {
+        text: context + (wiki_url ? `. Read more on Wikipedia ${wiki_url}` : ""),
+        lang: langSel.value
+      };
+      const ttsRes = await fetch("/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(ttsPayload)
+      });
+      const audioBlob = await ttsRes.blob();
+      const url       = URL.createObjectURL(audioBlob);
+      new Audio(url).play();
+    }
+
+    // Allow Enter key
+    textIn.addEventListener("keyup", e => {
+      if (e.key === "Enter") sendBtn.click();
+    });
+  </script>
+</body>
+</html>

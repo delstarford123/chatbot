@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Teacher Dashboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #f0f4f8, #d9e2ec);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background-color: #ffffff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 600px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 16px;
+      color: #333;
+    }
+
+    p {
+      text-align: center;
+      font-size: 15px;
+      color: #555;
+      margin-bottom: 24px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    ul li {
+      background-color: #f4f4f4;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      font-size: 15px;
+      color: #333;
+    }
+
+    ul li:last-child {
+      margin-bottom: 0;
+    }
+
+    .empty {
+      text-align: center;
+      font-style: italic;
+      color: #888;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Requests for {{ teacher.name }}</h1>
+    <p>Viewing on WhatsApp: {{ teacher.phone }}</p>
+
+    <ul>
+      {% for r in requests %}
+        <li>
+          <strong>{{ r.student_name }}</strong> ({{ r.student_phone }})<br/>
+          Subject: <em>{{ r.subject }}</em><br/>
+          Requested at: {{ r.timestamp.strftime('%Y-%m-%d %H:%M') }}
+        </li>
+      {% else %}
+        <li class="empty">No requests yet.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</body>
+</html>

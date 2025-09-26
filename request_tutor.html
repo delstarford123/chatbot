@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Request a Tutor</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #f0f4f8, #d9e2ec);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background-color: #ffffff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 24px;
+      color: #333;
+    }
+
+    form label {
+      display: block;
+      margin-bottom: 16px;
+      font-weight: 600;
+      color: #444;
+    }
+
+    input[type="text"],
+    input[type="tel"],
+    input[name="student_name"],
+    input[name="student_phone"],
+    input[name="subject"] {
+      width: 100%;
+      padding: 10px 12px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #0078d4;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background-color: #005ea2;
+    }
+
+    .message {
+      margin-bottom: 16px;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .error {
+      background-color: #fdecea;
+      color: #d93025;
+    }
+
+    .success {
+      background-color: #e6f4ea;
+      color: #188038;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Request a Tutor</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="message {{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST">
+      <label>Your Name:
+        <input type="text" name="student_name" required/>
+      </label>
+
+      <label>Your Phone (WhatsApp):
+        <input type="tel" name="student_phone" required/>
+      </label>
+
+      <label>Subject:
+        <input type="text" name="subject" required/>
+      </label>
+
+      <button type="submit">Submit Request</button>
+    </form>
+  </div>
+</body>
+</html>

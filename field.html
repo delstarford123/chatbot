@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Choose Your Path</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #f0f4f8, #d9e2ec);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      position: relative;
+    }
+
+    /* 🔴 Profile image in top-right */
+    .profile-wrapper {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      text-align: center;
+    }
+
+    .profile-pic {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 3px solid #d93025;
+      box-shadow: 0 0 12px #d93025;
+      animation: pulseRed 2s infinite;
+    }
+
+    @keyframes pulseRed {
+      0%   { box-shadow: 0 0 12px #d93025; }
+      50%  { box-shadow: 0 0 20px #ff6b6b; }
+      100% { box-shadow: 0 0 12px #d93025; }
+    }
+
+    .profile-placeholder {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background-color: #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      color: white;
+      margin-bottom: 10px;
+    }
+
+    .profile-wrapper form {
+      margin-top: 10px;
+    }
+
+    .profile-wrapper input[type="file"] {
+      display: block;
+      margin: 6px auto;
+      font-size: 13px;
+    }
+
+    .profile-wrapper button {
+      padding: 6px 10px;
+      font-size: 13px;
+      background-color: #d93025;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .profile-wrapper button:hover {
+      background-color: #a61c1c;
+    }
+
+    /* 🟤 Logout button in top-left */
+    .logout-top {
+      position: absolute;
+      top: 20px;
+      left: 30px;
+      font-size: 14px;
+    }
+
+    .logout-top a {
+      color: white;
+      background-color: #800000;
+      padding: 10px 14px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 500;
+      box-shadow: 0 0 12px #800000;
+      animation: pulseMaroon 2s infinite;
+    }
+
+    .logout-top a:hover {
+      background-color: #5c0000;
+    }
+
+    @keyframes pulseMaroon {
+      0%   { box-shadow: 0 0 12px #800000; }
+      50%  { box-shadow: 0 0 20px #b22222; }
+      100% { box-shadow: 0 0 12px #800000; }
+    }
+
+    .container {
+      background-color: #ffffff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 24px;
+      color: #333;
+    }
+
+    p {
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 20px 0;
+    }
+
+    ul li {
+      margin: 12px 0;
+    }
+
+    ul li a {
+      display: block;
+      padding: 12px;
+      background-color: #0078d4;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: background-color 0.3s ease;
+    }
+
+    ul li a:hover {
+      background-color: #005ea2;
+    }
+  </style>
+</head>
+<body>
+  <div class="logout-top">
+    <a href="{{ url_for('logout') }}">Logout</a>
+  </div>
+
+  <div class="profile-wrapper">
+    {% if user.profile_image %}
+      <img src="{{ url_for('static', filename='profiles/' + user.profile_image) }}" class="profile-pic" alt="Profile Picture"/>
+    {% else %}
+      <div class="profile-placeholder">👤</div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('upload_profile') }}" enctype="multipart/form-data">
+      <input type="file" name="profile" accept=".jpg,.jpeg,.png" required/>
+      <button type="submit">Change Profile Picture</button>
+    </form>
+  </div>
+
+  <div class="container">
+    <h1>Welcome, {{ user.name }}!</h1>
+    <p>Select what you want to do:</p>
+
+    <ul>
+      <li><a href="{{ url_for('learn_page') }}">Learn with Sarah</a></li>
+      <li><a href="{{ url_for('register_teacher') }}">Register as a Teacher</a></li>
+      <li><a href="{{ url_for('request_tutor') }}">Request a Tutor</a></li>
+      <li><a href="{{ url_for('upload_documents') }}">Upload Learning Docs</a></li>
+    </ul>
+  </div>
+</body>
+</html>

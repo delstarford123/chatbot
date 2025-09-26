@@ -1,0 +1,50 @@
+{
+  "users": {
+    "alice_example_com": {
+      "name": "Alice Teacher",
+      "email": "alice@example.com",
+      "password_hash": "<bcrypt-or-werkzeug-hash-here>",
+      "profile_image": "alice_profile.jpg"
+    },
+    "bob_example_com": {
+      "name": "Bob Tutor",
+      "email": "bob@example.com",
+      "password_hash": "<hashed_password>",
+      "profile_image": "bob_profile.jpg"
+    }
+  },
+  "teachers": {
+    "+254700000001": {
+      "name": "Alice Teacher",
+      "phone": "+254700000001"
+    },
+    "+254700000002": {
+      "name": "Bob Tutor",
+      "phone": "+254700000002"
+    }
+  },
+  "requests": {
+    "-MreqKey1": {
+      "student_name": "Jane Student",
+      "student_phone": "+254712345678",
+      "subject": "Mathematics",
+      "teacher_phone": "+254700000001"
+    },
+    "-MreqKey2": {
+      "student_name": "John Learner",
+      "student_phone": "+254711223344",
+      "subject": "Physics",
+      "teacher_phone": "+254700000002"
+    }
+  },
+  "documents": {
+    "-MdocKey1": {
+      "title": "Algebra Basics",
+      "filename": "algebra_basics.pdf"
+    },
+    "-MdocKey2": {
+      "title": "Introduction to Chemistry",
+      "filename": "intro_chemistry.pdf"
+    }
+  }
+}
