@@ -10,3 +10,4 @@ google-cloud-speech==2.14.0
 firebase-admin==6.2.0
 Werkzeug==2.3.7
 gunicorn==21.2.0
+twilio==8.4.0
