@@ -14,3 +14,8 @@ faiss-cpu==1.7.4
 pdfminer.six==20221105
 google-cloud-texttospeech==2.14.0
 google-cloud-speech==2.14.0
+Flask
+firebase-admin
+Werkzeug
+python-dotenv
+gunicorn
