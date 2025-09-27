@@ -9,12 +9,17 @@ from twilio.rest import Client
 from twilio.twiml.messaging_response import MessagingResponse
 import firebase_admin
 from firebase_admin import credentials, db
-from learn_sarah.assistant import ChatAssistant
+
+from assistant import ChatAssistant
 from google.cloud import speech_v1p1beta1 as speech
 from google.cloud import texttospeech
 import os
 from dotenv import load_dotenv
+import os
+import firebase_admin
+from firebase_admin import credentials
 
+cred_path = os
 from flask import (
     Flask,
     render_template,
@@ -37,7 +42,7 @@ from twilio.twiml.messaging_response import MessagingResponse
 import firebase_admin
 from firebase_admin import credentials, db
 
-from learn_sarah.assistant import ChatAssistant
+
 
 from google.cloud import speech_v1p1beta1 as speech
 from google.cloud import texttospeech
@@ -57,15 +62,46 @@ load_dotenv()
 
 
 # 2. Init Flask
+#app = Flask(__name__, template_folder="templates", static_folder="static")
+#app.config["SECRET_KEY"]   = SECRET_KEY
+#app.config["UPLOAD_FOLDER"] = "documents"
+#os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+
+import os
+from flask import Flask
+
+# 2. Init Flask
 app = Flask(__name__, template_folder="templates", static_folder="static")
-app.config["SECRET_KEY"]   = SECRET_KEY
-app.config["UPLOAD_FOLDER"] = "documents"
-os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+
+# Ensure SECRET_KEY is set securely
+SECRET_KEY = os.environ.get("SECRET_KEY", "fallback-secret-key")
+app.config["SECRET_KEY"] = SECRET_KEY
+
+# Set up upload folder
+UPLOAD_FOLDER = os.path.join(os.getcwd(), "documents")
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+
+
+
+
+
 
 # 3. Init Firebase
-cred = credentials.Certificate(SERVICE_ACCOUNT_PATH)
-firebase_admin.initialize_app(cred, {"databaseURL": FIREBASE_DB_URL})
+#cred = credentials.Certificate(SERVICE_ACCOUNT_PATH)
+#firebase_admin.initialize_app(cred, {"databaseURL": FIREBASE_DB_URL})
 
+import firebase_admin
+from firebase_admin import credentials
+
+# 3. Init Firebase safely
+cred = credentials.Certificate(SERVICE_ACCOUNT_PATH)
+
+if not firebase_admin._apps:
+    firebase_admin.initialize_app(cred, {
+        "databaseURL": FIREBASE_DB_URL
+    })
 # 4. Init Twilio & ChatAssistant
 twilio_client = Client(TWILIO_SID, TWILIO_TOKEN)
 assistant     = ChatAssistant()
